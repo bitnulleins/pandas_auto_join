@@ -1,6 +1,8 @@
-<center>
-<img src="./assets/logo.svg" style="margin-bottom:20px;" width="300" />
-</center>
+<p align="center">
+<img src="./assets/logo.svg" width="300" />
+
+<img src="https://img.shields.io/badge/version-0.1.3-blue" /> <img src="https://img.shields.io/github/license/bitnulleins/pandas_auto_join" /> 
+</p>
 
 # 🔄 Pandas AutoJoin
 
