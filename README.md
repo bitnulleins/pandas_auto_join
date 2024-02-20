@@ -16,16 +16,11 @@ The framework simplifies the automation of data acquisition a part of Data Scien
 
 ## Installation
 
+> [!NOTE]  
+> Actually the framework **isn't** add to Python Package Index (pypi) yet.
+
 ```shell
 pip install pandas-auto-join
-```
-
-or build locally:
-
-```shell
-python3 -m pip install --upgrade build
-python3 -m build
-pip install -e .
 ```
 
 Requirements:
