@@ -6,7 +6,7 @@
 <img src="https://img.shields.io/badge/version-0.1.3-blue" /> <img src="https://img.shields.io/github/license/bitnulleins/pandas_auto_join" /> 
 </p>
 
-# 🔄 Pandas AutoJoin
+# Pandas AutoJoin
 
 With the help of this lightweight framework it is possible to **automatically join two or more large dataframes** together. *Pandas AutoJoin* offers the following features:
 
