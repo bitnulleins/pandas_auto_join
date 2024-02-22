@@ -76,7 +76,7 @@ Execute AutoJoin by CLI:
 python ./src/cli.py './example/data/flights.csv' './example/data/bag.csv' --output='./example/data/final.csv' --how='left'
 ```
 
-**[Result tabel](./example/data/final.csv)**
+**[Result table](./example/data/final.csv)**
 
 | Index | FLUGNUMMER | ID    | PAX   | BAG.FLIGHT_DATE | _BAG.AMOUNT_ |
 | ----- | ---------- | ----- | ----- | --------------- | ------------ |
