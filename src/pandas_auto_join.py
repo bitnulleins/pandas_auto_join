@@ -42,11 +42,15 @@ def join(
             for idx, df in tqdm(enumerate(args), desc='[INFO] JOIN DATAFRAMES', total=len(args), unit='df'):
                 if df.index.name == None: df.index.name = f"DF{idx}"
 
+                if len(df.columns) == 1:
+                    raise Exception(f"Dataframe {df.index.name} has only one column. Nothing to join.")
+
                 # Prepare dataframe
                 if idx == 0:
                     start_columns = df.columns
                     start_rows = len(df)
                     main_df     = __prepare(df, verbose)
+                    main_df_copy= main_df.copy()
                     # Stop if first (main) df preparation is finished
                     if len(args) > 1: continue
                     else: return main_df
@@ -54,7 +58,7 @@ def join(
                     other_df    = __prepare(df, verbose)
 
                 # Find and prepare possible join key
-                left_key, right_key     = __join_key(main_df, other_df, start_columns, verbose)
+                left_key, right_key     = __join_key(main_df_copy, other_df, start_columns, verbose)
                 main_df, left_key_tmp   = __prepare_join_key(main_df, left_key)
                 other_df, right_key_tmp = __prepare_join_key(other_df, right_key)
                 
@@ -67,6 +71,9 @@ def join(
                     how         = how,
                     suffixes    = (None,'_joined')
                 )
+
+                # Reset index name after merge
+                main_df.index.name = main_df_copy.index.name
 
                 if verbose: logging.info(f"{other_df.index.name} | Sucessfully added {len(main_df[right_key].dropna())} new data rows.")
                 main_df.drop(columns=right_key + right_key_tmp, inplace=True)
@@ -91,7 +98,6 @@ def join(
     except Exception as e:
         if config.setting['DEBUG']: print(traceback.format_exc())
         logging.error(f"Some error occurred: {e}")
-        return args[0]
 
 def __prepare(df: pd.DataFrame, verbose: int) -> pd.DataFrame:
     """Prepares the dataframe for joining. The following is done:
@@ -181,7 +187,7 @@ def __join_key( main_df: pd.DataFrame,
         if non_empty(series1, series2): continue
         if check_length(series1, series2): continue
         if check_dtype(series1, series2): continue
-
+        
         set1 = set(main_df[combination[0]])
         set2 = set(other_df[combination[1]])
         intersection = set1.intersection(set2)
@@ -191,7 +197,7 @@ def __join_key( main_df: pd.DataFrame,
     sorted_intersection = sorted(intersection_len.items(), key=lambda item: item[1], reverse=True)
     intersection_threshold = math.floor((len(other_df) / max(len(main_df), len(other_df))) * 10) / 10
     possible = {k: v for k, v in sorted_intersection if v >= intersection_threshold}
-    if len(possible) == 0: raise Exception("No possible join-key found! :(")
+    if len(possible) == 0: raise Exception("No possible join-key found!")
     left_key, right_key = zip(*possible)
 
     # Check if column combination are unique, otherwise remove similar key
@@ -200,7 +206,7 @@ def __join_key( main_df: pd.DataFrame,
 
     if verbose:
         logging.info(f"{other_df.index.name} | Dynamically calculated threshold: {intersection_threshold}")
-        logging.info(f"{other_df.index.name} | Join by {main_df.index.name}: {', '.join(left_key)} <-> {other_df.index.name}: {', '.join(right_key)}")
+        logging.info(f"{other_df.index.name} | Join by {main_df.index.name}[{', '.join(left_key)}] <-> {other_df.index.name}[{', '.join(right_key)}]")
     return left_key, right_key
 
 def __prepare_join_key(df: pd.DataFrame, keys: list) -> pd.DataFrame:

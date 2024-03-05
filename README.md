@@ -12,7 +12,7 @@ With the help of this lightweight framework it is possible to **automatically jo
 
 -   Simple usage
 -   Automatic primary and foreign key detection<br />(technical and combound keys)
--   Automatic datatype detection
+-   Automatic datatype detection and conversion
 -   Step-by-step description
 -   Command Line Interface ([CLI](#command-line-interface-cli))
 
@@ -51,38 +51,46 @@ _Debug Mode:_ You can change the `DEBUG` stage in [config.py](./src/config.py) f
 
 ## Example
 
-**[Table 1](./example/data/flights.csv) (Left table)**
+**[Table 1](./example/data/flights.csv) (Mail table)**
 
-| FLIGHTNUMBER | DATE       | PASSENGER |
-| ------------ | ---------- | --------- |
-| ABC 1234     | 2024-02-01 | 232       |
-| XYZ 1234     | 2024-02-02 | 190       |
-| DEF 343      |            | 150       |
+| FLIGHTNUMBER | DATE       | PASSENGER | AIRPORT |
+| ------------ | ---------- | --------- | ------- |
+| ABC 1234     | 2024-02-01 | 232       | 1       |
+| XYZ 1234     | 2024-02-02 | 190       | 2       |
+| DEF 343      |            | 150       | 3       |
 
-**[Table 2](./example/data/bag.csv) (Right table)**
+**[Table 2](./example/data/bag.csv) (Second table)**
 
-Sucessfully joined `BAG.AMOUNT` column for exist value (`LEFTJOIN`)
+It exist an non-technical combound key for `FLIGHTNUMBER`, `DATE` and `BAG.FLIGHT`, `BAG.FLIGHT_DATE`.
 
 | BAG.FLIGHT | BAG.FLIGHT_DATE | _BAG.AMOUNT_ |
 | ---------- | --------------- | ------------ |
 | ABC1234    | 2024-02-01      | _120_        |
 | XYZ1234    | 2024-02-02      | _89_         |
 
-It exist an non-technical combound key for `FLIGHTNUMBER`, `DATE` and `BAG.FLIGHT`, `BAG.FLIGHT_DATE`.
+**[Table 3](./example/data/airports.csv) (Third table)**
+
+It exist a technical key between airports table (`ID`) and flights table (`AIRPORT`).
+
+| ID  | NAME |
+| --- | ---- |
+| 1   | HAM  |
+| 2   | FRA  |
+| 3   | LHR  |
 
 Execute AutoJoin by CLI:
 
 ```shell
-python ./src/cli.py './example/data/flights.csv' './example/data/bag.csv' --output='./example/data/final.csv' --how='left'
+python ./src/cli.py './example/data/flights.csv' './example/data/bag.csv' './example/data/airports.csv' --output='./example/data/final.csv' --how='left'
 ```
 
 **[Result table](./example/data/final.csv)**
 
-| Index | FLUGNUMMER | ID    | PAX   | BAG.FLIGHT_DATE | _BAG.AMOUNT_ |
-| ----- | ---------- | ----- | ----- | --------------- | ------------ |
-| 0     | ABC 1234   | 345.0 | 232.0 | 2024-02-01      | _120.0_      |
-| 1     | XYZ 1234   | 23.0  | 190.0 | 2024-02-02      | _89.0_       |
-| 2     | DEF 343    | 1.0   | 150.0 |                 |              |
+| Index | FLUGNUMMER | ID    | PAX   | BAG.FLIGHT_DATE | _BAG.AMOUNT_ | _NAME_ |
+| ----- | ---------- | ----- | ----- | --------------- | ------------ | ------ |
+| 0     | ABC 1234   | 345.0 | 232.0 | 2024-02-01      | _120.0_      | HAM    |
+| 1     | XYZ 1234   | 23.0  | 190.0 | 2024-02-02      | _89.0_       | FRA    |
+| 2     | DEF 343    | 1.0   | 150.0 |                 |              | LHR    |
 
 ## Command Line Interface (CLI)
 
