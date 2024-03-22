@@ -16,6 +16,16 @@ With the help of this lightweight framework it is possible to **automatically jo
 -   Step-by-step description
 -   Command Line Interface ([CLI](#command-line-interface-cli))
 
+The following data integration problems are thus solved automatically:
+- Identifier conflicts
+- Homonyms and synonyms
+- Data type conflict
+
+Features not yet implemented:
+- Multilateral correspondences
+- Semantic data integration
+- Redundancies
+
 The framework simplifies the automation of data acquisition a part of Data Science Life Cycle. It extends the benefits of AutoML and makes it more accessible to machine learning beginners.
 
 ## Installation
