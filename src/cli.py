@@ -44,8 +44,6 @@ def main(files, how, output, verbose):
             if not output: output = '_'.join([os.path.splitext(os.path.basename(file))[0] for file in files]) + first_file_ext
             filename, ext = os.path.splitext(os.path.basename(output))
 
-            print(result)
-
             if ext == '.parquet':
                 result.to_parquet(output)
             elif ext == '.csv':
