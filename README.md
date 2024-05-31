@@ -3,7 +3,8 @@
 </p>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-0.1.3-blue" /> <img src="https://img.shields.io/github/license/bitnulleins/pandas_auto_join" /> 
+<img src="https://img.shields.io/pypi/v/pandas_auto_join" /> <img src="https://img.shields.io/github/license/bitnulleins/pandas_auto_join" />  <img src="https://img.shields.io/github/size/bitnulleins/pandas_auto_join/src%2Fpandas_auto_join.py?branch=main
+">
 </p>
 
 # Pandas AutoJoin
