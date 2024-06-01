@@ -3,8 +3,7 @@
 </p>
 
 <p align="center">
-<img src="https://img.shields.io/pypi/v/pandas_auto_join" /> <img src="https://img.shields.io/github/license/bitnulleins/pandas_auto_join" />  <img src="https://img.shields.io/github/size/bitnulleins/pandas_auto_join/src%2Fpandas_auto_join.py?branch=main
-">
+<img src="https://img.shields.io/badge/version-1.0.0-blue" /> <img src="https://img.shields.io/github/license/bitnulleins/pandas_auto_join" />  <img src="https://img.shields.io/github/size/bitnulleins/pandas_auto_join/src%2Fpandas_auto_join%2F__init__.py">
 </p>
 
 # Pandas AutoJoin
@@ -12,22 +11,20 @@
 With the help of this lightweight framework it is possible to **automatically join two or more large dataframes** together. _Pandas AutoJoin_ offers the following features:
 
 -   Simple usage
--   Automatic primary and foreign key detection<br />(technical and combound keys)
--   Automatic datatype detection and conversion
--   Step-by-step description
+-   Automatic primary and foreign key detection<br />(technical and composite keys)
+-   Detect and solve some data conflicts<br />(Misspellings, Homonyms, Synonyms, Datatypes...)
 -   Command Line Interface ([CLI](#command-line-interface-cli))
 
-The following data integration problems are thus solved automatically:
-- Identifier conflicts
-- Homonyms and synonyms
-- Data type conflict
-
-Features not yet implemented:
-- Multilateral correspondences
-- Semantic data integration
-- Redundancies
-
 The framework simplifies the automation of data acquisition a part of Data Science Life Cycle. It extends the benefits of AutoML and makes it more accessible to machine learning beginners.
+
+# Content
+
+- [Installation](#installation)
+  - [Usage](#usage)
+  - [Documentation](#documentation)
+- [Command Line Interface (CLI)](#command-line-interface-cli)
+- [Example](#example)
+- [Cite / Paper](#cite--paper)
 
 ## Installation
 
@@ -35,7 +32,7 @@ The framework simplifies the automation of data acquisition a part of Data Scien
 > Actually the framework **isn't** add to Python Package Index (pypi) yet.
 
 ```shell
-pip install pandas-auto-join
+pip install pandas_auto_join
 ```
 
 Requirements:
@@ -44,84 +41,142 @@ Requirements:
 -   pandas
 -   click
 -   tqdm
+-   Levenshtein
 
-## Usage
+### Usage
+
+Let `df1` be the reference `Pandas` dataframe table and `df2` other input tables for join. Then the automatic join can perform easliy by:
 
 ```python
+import pandas as pd
 import pandas_auto_join as aj
+df1 = pd.read_csv('./example/datasets/flights/flights.csv')
+df2 = pd.read_csv('./example/datasets/flights/airlines.csv')
 df = aj.join(df1, df2)
+print(df)
 ```
 
 or as CLI:
 
 ```shell
-python ./src/cli.py 'dataframe_path_1' 'dataframe_path_2'
+python -m pandas_auto_join './example/datasets/flights/flights.csv' './example/datasets/flights/airlines.csv'
 ```
 
-_Debug Mode:_ You can change the `DEBUG` stage in [config.py](./src/config.py) file.
+_Debug Mode:_ You can change the `DEBUG` stage in [config.py](./src/pandas_auto_join/config.py) file.
 
-## Example
+### Documentation
 
-**[Table 1](./example/data/flights.csv) (Mail table)**
-
-| FLIGHTNUMBER | DATE       | PASSENGER | AIRPORT |
-| ------------ | ---------- | --------- | ------- |
-| ABC 1234     | 2024-02-01 | 232       | 1       |
-| XYZ 1234     | 2024-02-02 | 190       | 2       |
-| DEF 343      |            | 150       | 3       |
-
-**[Table 2](./example/data/bag.csv) (Second table)**
-
-It exist an non-technical combound key for `FLIGHTNUMBER`, `DATE` and `BAG.FLIGHT`, `BAG.FLIGHT_DATE`.
-
-| BAG.FLIGHT | BAG.FLIGHT_DATE | _BAG.AMOUNT_ |
-| ---------- | --------------- | ------------ |
-| ABC1234    | 2024-02-01      | _120_        |
-| XYZ1234    | 2024-02-02      | _89_         |
-
-**[Table 3](./example/data/airports.csv) (Third table)**
-
-It exist a technical key between airports table (`ID`) and flights table (`AIRPORT`).
-
-| ID  | NAME |
-| --- | ---- |
-| 1   | HAM  |
-| 2   | FRA  |
-| 3   | LHR  |
-
-Execute AutoJoin by CLI:
-
-```shell
-python ./src/cli.py './example/data/flights.csv' './example/data/bag.csv' './example/data/airports.csv' --output='./example/data/final.csv' --how='left'
+```python
+def join(
+    *args: Tuple[pd.DataFrame], 
+    how: str = 'inner',
+    strategy: str = 'levenshtein',
+    threshold: float = 0.5,
+    verbose: int = 0
+)
 ```
 
-**[Result table](./example/data/final.csv)**
+Parameters
 
-| Index | FLUGNUMMER | ID    | PAX   | BAG.FLIGHT_DATE | _BAG.AMOUNT_ | _NAME_ |
-| ----- | ---------- | ----- | ----- | --------------- | ------------ | ------ |
-| 0     | ABC 1234   | 345.0 | 232.0 | 2024-02-01      | _120.0_      | HAM    |
-| 1     | XYZ 1234   | 23.0  | 190.0 | 2024-02-02      | _89.0_       | FRA    |
-| 2     | DEF 343    | 1.0   | 150.0 |                 |              | LHR    |
+* **args : *Tuple[pd.DataFrame]***<br />Dataframes, at least two for join.
+* **how : *str*, default = 'inner'**<br />How join should perform *inner*, *left* or *outer*.
+* **strategy : *str*, default = 'levenshtein'**<br />Similarity strategy for detect string similarity.
+  1. *levenshtein*: [Levenshtein](https://en.wikipedia.org/wiki/Levenshtein_distance) edit based distance
+  2. *jaro*: [Jaro](https://en.wikipedia.org/wiki/Jaro–Winkler_distance) distance
+* **threshold : *float*, default = 0.5**:<br />How similar should strings be? Value between 0.0 and 1.0.
+  1. 0.0 = No similarity check
+  2. 1.0 = Equi-join, strings has to be equal
+* **verbose : *int*, default = 0**:<br />Print informative messages while run (1=yes, 0=no)
 
-## Command Line Interface (CLI)
+## Command Line Interface (CLI) 
 
 ```shell
  PANDAS
-     _         _            _       _
-    / \  _   _| |_ ___     | | ___ (_)_ __
-   / _ \| | | | __/ _ \ _  | |/ _ \| | '_ \
+     _         _            _       _       
+    / \  _   _| |_ ___     | | ___ (_)_ __  
+   / _ \| | | | __/ _ \ _  | |/ _ \| | '_ \ 
   / ___ \ |_| | || (_) | |_| | (_) | | | | |
  /_/   \_\__,_|\__\___/ \___/ \___/|_|_| |_|
-
-
-Usage: cli.py [OPTIONS] FILES...
+                                            
+          
+Usage: python -m pandas_auto_join [OPTIONS] FILES...
 
   Command to load and auto join two or more dataframes. Actually support
   PARQUET and CSV files.
 
 Options:
-  -h, --how [left|inner|outer]  Pandas merge type.  [default: inner]
-  -o, --output TEXT             Name of output file with file extension.
-  -v, --verbose INTEGER         Print feedback while running.  [default: 0]
-  --help                        Show this message and exit.                     Show this message and exit.
+  -h, --how [left|inner|outer]    Pandas merge type.  [default: inner]
+  -ss, --strategy [levenshtein|jaro]
+                                  Algorithm for calculating similarity score.
+                                  [default: levenshtein]
+  -st, --threshold FLOAT RANGE    Threshold for similiarity of strings. 1 =
+                                  Equi-join. 0 = Accept all.  [default: 0.5;
+                                  0<=x<=1]
+  -o, --output TEXT               Name of output file with file extension.
+  -v, --verbose INTEGER RANGE     Print feedback while running.  [default: 0;
+                                  0<=x<=1]
+  --help                          Show this message and exit.
 ```
+
+
+## Example
+
+An example with five datasets and different data conflicts:
+
+- Different column names for each table
+- Detect `Flight` and `Date` are composite keys for `FLNo`and `FLDate`
+- `FLNo` has white spaces and `Flight` not
+- `FLDate` different format than `Date`
+- `Bag` is foreign key (number) for `bagid`
+- `Airline` has misspellings in names `Airline`
+
+**[Flights](./example/datasets/flights/flights.csv) (Reference table)**
+
+| Flight  | Date       | Bag   | Airline   |
+| ------- | ---------- | ----- | --------- |
+| ABC1234 | 2024-02-01 | 43242 | Luthansa  |
+| ABC1234 | 2024-02-02 | 34234 | Eurowoing |
+| ...     | ...        | ...   | ...       |
+
+**[Transcation Data: Flight times](./example/datasets/flights/flight_times.csv)**
+
+| FLNo     | FLDate     | Time  |
+| -------- | ---------- | ----- |
+| ABC 1234 | 02/01/2024 | 08:00 |
+| ABC 1234 | 02/02/2024 | 13:00 |
+| ...      | ...        | ...   |
+
+**[Transcation Data: Baggage](./example/datasets/flights/baggage.csv)**
+
+| bagid    | bagcount |
+| -------- | -------- |
+| 43242    | 143      |
+| 34234    | 89       |
+| ...      | ...      |
+
+**[Master data: Airline](./example/datasets/flights/airlines.csv)**
+
+| Airline   | Code |
+| --------- | ---- |
+| Lufthansa | LH   |
+| Eurowings | EW   |
+| ...       | ...  |
+
+**✅ Result table**
+
+```python
+import pandas_auto_join as aj
+df = aj.join(flights, flight_times, baggage, airlines)
+```
+
+| Flight  | Date       | Bag   | Airline   | _Time_ | _bagcount_ | _Code_ |
+| ------- | ---------- | ----- | --------- | ------ | ---------- | ------ |
+| ABC1234 | 2024-02-01 | 43242 | Luthansa  | 08:00  | 143        | LH     |
+| ABC1234 | 2024-02-02 | 34234 | Eurowoing | 13:00  | 89         | EW     |
+| ...     | ...        | ...   | ...       | ...    | ...        | ...    |
+
+
+## Cite / Paper
+
+> [!NOTE]  
+> Paper on the framework with benchmarks has not yet been published, but will be submitted later.
