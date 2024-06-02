@@ -20,11 +20,11 @@ The framework simplifies the automation of data acquisition a part of Data Scien
 # Content
 
 - [Installation](#installation)
-  - [Usage](#usage)
-  - [Documentation](#documentation)
+- [Usage](#usage)
+- [Documentation](#documentation)
 - [Command Line Interface (CLI)](#command-line-interface-cli)
 - [Example](#example)
-- [Cite / Paper](#cite--paper)
+- [Paper (Citation)](#paper-citation)
 
 ## Installation
 
@@ -43,7 +43,7 @@ Requirements:
 -   tqdm
 -   Levenshtein
 
-### Usage
+## Usage
 
 Let `df1` be the reference `Pandas` dataframe table and `df2` other input tables for join. Then the automatic join can perform easliy by:
 
@@ -64,7 +64,7 @@ python -m pandas_auto_join './example/datasets/flights/flights.csv' './example/d
 
 _Debug Mode:_ You can change the `DEBUG` stage in [config.py](./src/pandas_auto_join/config.py) file.
 
-### Documentation
+## Documentation
 
 ```python
 def join(
@@ -78,7 +78,7 @@ def join(
 
 Parameters
 
-* **args : *Tuple[pd.DataFrame]***<br />Dataframes, at least two for join.
+* ***args : *Tuple[pd.DataFrame]***<br />Dataframes, at least two for join.
 * **how : *str*, default = 'inner'**<br />How join should perform *inner*, *left* or *outer*.
 * **strategy : *str*, default = 'levenshtein'**<br />Similarity strategy for detect string similarity.
   1. *levenshtein*: [Levenshtein](https://en.wikipedia.org/wiki/Levenshtein_distance) edit based distance
@@ -176,7 +176,7 @@ df = aj.join(flights, flight_times, baggage, airlines)
 | ...     | ...        | ...   | ...       | ...    | ...        | ...    |
 
 
-## Cite / Paper
+## Paper (Citation)
 
 > [!NOTE]  
 > Paper on the framework with benchmarks has not yet been published, but will be submitted later.
