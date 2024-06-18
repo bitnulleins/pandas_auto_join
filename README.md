@@ -19,29 +19,20 @@ The framework simplifies the automation of data acquisition a part of Data Scien
 
 # Content
 
-- [Installation](#installation)
+- [Requirements](#requirements)
 - [Usage](#usage)
 - [Documentation](#documentation)
 - [Command Line Interface (CLI)](#command-line-interface-cli)
 - [Example](#example)
 - [Paper (Citation)](#paper-citation)
 
-## Installation
+## Requirements
 
-> [!NOTE]  
-> Actually the framework **isn't** add to Python Package Index (pypi) yet.
-
-```shell
-pip install pandas_auto_join
-```
-
-Requirements:
-
--   Python >= 3.8
--   pandas
--   click
--   tqdm
--   Levenshtein
+- [x] Python >= 3.8
+- [x] pandas
+- [x] click
+- [x] tqdm
+- [x] Levenshtein
 
 ## Usage
 
