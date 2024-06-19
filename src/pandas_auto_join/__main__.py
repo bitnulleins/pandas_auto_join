@@ -10,11 +10,11 @@ from tqdm import tqdm
 @click.command()
 @click.argument('files', type=click.Path(exists=True), nargs=-1, required=True)
 @click.option('--how', '-h', default='inner', show_default=True, type=click.Choice(['left', 'inner', 'outer'], case_sensitive=True), help="Pandas merge type.")
-@click.option('--strategy','-ss', show_default=True,type=click.Choice(['levenshtein', 'jaro']), default='levenshtein', help='Algorithm for calculating similarity score.')
+@click.option('--strategy','-ss', show_default=True,type=click.Choice(['levenshtein', 'jaro','sets']), default='levenshtein', help='Algorithm for calculating similarity score.')
 @click.option('--threshold','-st', show_default=True, type=click.FloatRange(0, 1), default=0.5, help="Threshold for similiarity of strings. 1 = Equi-join. 0 = Accept all.")
 @click.option('--output', '-o', default=None, help="Name of output file with file extension.")
 @click.option('--verbose', '-v', default=0, type=click.IntRange(0, 1), show_default=True, help="Print feedback while running.")
-def main(files, how, similarity_strategy, similarity_threshold, overlap_strategy, output, verbose):
+def main(files, how, strategy, threshold, output, verbose):
     """Command to load and auto join two or more dataframes.
     Actually support PARQUET and CSV files."""
     list_of_df = []

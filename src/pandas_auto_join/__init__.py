@@ -27,7 +27,7 @@ def join(
     how : str, optional
         Join type, by default 'left'
     strategy : str, optional
-        Similarity algorithm: jaro, levenshtein (default)
+        Similarity algorithm: jaro, sets, levenshtein (default)
     threshold: float, optional
         Threshold for similarity between 0.0 (no similarity check) and 1.0 (equi-join)
     verbose : int, optional
@@ -39,7 +39,7 @@ def join(
         Finished new final joined dataframe
     """
     try:
-        if similarity_threshold < 0 or similarity_threshold > 1:
+        if threshold < 0 or threshold > 1:
             raise Exception("Similarity float value threshold has to be between 0 and 1.")
         config.setting['VERBOSE'] = verbose
         if len([df for df in args if isinstance(df, pd.DataFrame)]):
@@ -63,8 +63,8 @@ def join(
                 main_df, other_df = __generate_similarity(
                     df1         = main_df.copy(),
                     df2         = other_df.copy(),
-                    algo        = similarity_strategy,
-                    threshold   = similarity_threshold
+                    algo        = strategy,
+                    threshold   = threshold
                 )
 
                 # Find overlap possible keys
@@ -86,7 +86,7 @@ def join(
                 main_df.index.name = index_name
                 main_df = main_df.loc[:,~main_df.columns.str.startswith(config.setting['JOIN_PREFIX'])]
 
-                if config.setting['VERBOSE']: logging.info(f"Added {len(other_df[right_key].dropna())} new data rows to dataframe.")
+                if config.setting['VERBOSE']: logging.info(f"Added {len(other_df[right_key].dropna())} new unique values to dataframe.")
 
             new_columns = list(set(begin_columns) ^ set(main_df.columns))
             if len(new_columns) > 0:
@@ -177,7 +177,9 @@ def __generate_similarity(
     def calc_similarity(str1, str2):
         """Return similarity between two strings for different algorithm.""" 
         if algo == 'jaro':
-            score = jaro(str1, str2)
+            score = jaro_winkler(str1, str2)
+        elif algo == 'sets':
+            score = setratio(str1, str2)
         else:
             # Levensthein
             score = ratio(str1, str2)

@@ -19,14 +19,22 @@ The framework simplifies the automation of data acquisition a part of Data Scien
 
 # Content
 
-- [Requirements](#requirements)
+- [Installation](#installation)
 - [Usage](#usage)
 - [Documentation](#documentation)
 - [Command Line Interface (CLI)](#command-line-interface-cli)
 - [Example](#example)
 - [Paper (Citation)](#paper-citation)
 
-## Requirements
+## Installation
+
+To install package and use it locally:
+
+```shell
+python -m pip install .
+```
+
+Requirements:
 
 - [x] Python >= 3.8
 - [x] pandas
@@ -72,8 +80,9 @@ Parameters
 * ***args : *Tuple[pd.DataFrame]***<br />Dataframes, at least two for join.
 * **how : *str*, default = 'inner'**<br />How join should perform *inner*, *left* or *outer*.
 * **strategy : *str*, default = 'levenshtein'**<br />Similarity strategy for detect string similarity.
-  1. *levenshtein*: [Levenshtein](https://en.wikipedia.org/wiki/Levenshtein_distance) edit based distance
-  2. *jaro*: [Jaro](https://en.wikipedia.org/wiki/Jaro–Winkler_distance) distance
+  1. *levenshtein*: [Levenshtein](https://en.wikipedia.org/wiki/Levenshtein_distance) edit based distance.<br />💡 Good for small differences in strings (e.g. Max Stne vs. Max St**o**ne).
+  2. *jaro*: [Jaro](https://en.wikipedia.org/wiki/Jaro–Winkler_distance) distance.<br />💡 Good for strings, that have similar prefix (e.g. **Max**-Whilem Stone, **Max** Stone).
+  3. *sets*: The best match between any strings in the first set and the second set.<br />💡 Good for string sequences, where order is swapped (e.g. Stone, Max vs. Max Stone).
 * **threshold : *float*, default = 0.5**:<br />How similar should strings be? Value between 0.0 and 1.0.
   1. 0.0 = No similarity check
   2. 1.0 = Equi-join, strings has to be equal
@@ -97,7 +106,7 @@ Usage: python -m pandas_auto_join [OPTIONS] FILES...
 
 Options:
   -h, --how [left|inner|outer]    Pandas merge type.  [default: inner]
-  -ss, --strategy [levenshtein|jaro]
+  -ss, --strategy [levenshtein|jaro|sets]
                                   Algorithm for calculating similarity score.
                                   [default: levenshtein]
   -st, --threshold FLOAT RANGE    Threshold for similiarity of strings. 1 =
@@ -108,7 +117,6 @@ Options:
                                   0<=x<=1]
   --help                          Show this message and exit.
 ```
-
 
 ## Example
 
@@ -158,6 +166,12 @@ An example with five datasets and different data conflicts:
 ```python
 import pandas_auto_join as aj
 df = aj.join(flights, flight_times, baggage, airlines)
+```
+
+or
+
+```shell
+python -m pandas_auto_join ./example/datasets/flights/flights.csv ./example/datasets/flights/flight_times.csv ./example/datasets/flights/baggage.csv ./example/datasets/flights/airlines.csv
 ```
 
 | Flight  | Date       | Bag   | Airline   | _Time_ | _bagcount_ | _Code_ |
