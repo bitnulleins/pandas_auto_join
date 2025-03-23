@@ -44,7 +44,7 @@ def join(
         config.setting['VERBOSE'] = verbose
         if len([df for df in args if isinstance(df, pd.DataFrame)]):
             for idx, df in tqdm(enumerate(args), desc='[INFO] JOIN DATAFRAMES', total=len(args), unit='df', leave=config.setting['VERBOSE']):
-                df.index.name = f"df{idx}"
+                df.index.name = f"df{idx+1}"
                 if idx == 0:
                     main_df = df.drop_duplicates()
                     begin_columns = main_df.columns
@@ -73,9 +73,8 @@ def join(
                     df2         = other_df.copy()
                 )
 
-                # Merge other_df to main_df
-                index_name = main_df.index.name
-                main_df = pd.merge(
+                # Check if join keys result in correct join
+                df_tmp = pd.merge(
                     left        = main_df.dropna(subset=left_key),
                     right       = other_df.dropna(subset=right_key),
                     left_on     = left_key,
@@ -83,10 +82,28 @@ def join(
                     how         = how,
                     suffixes    = ('','_duplicated')
                 )
-                main_df.index.name = index_name
-                main_df = main_df.loc[:,~main_df.columns.str.startswith(config.setting['JOIN_PREFIX'])]
+                if df_tmp.duplicated(subset=main_df.columns.difference(other_df.columns)).sum() > 0:
+                    logging.warning(f"Can't determine join keys for dataframe {other_df.index.name} – skip.")
+                elif len(df_tmp) == 0:
+                    logging.warning(f"Empty join for dataframe {other_df.index.name} – skip.")
+                else:
+                    # Merge other_df to main_df
+                    index_name = main_df.index.name
+                    main_df = pd.merge(
+                        left        = main_df.dropna(subset=left_key),
+                        right       = other_df.dropna(subset=right_key),
+                        left_on     = left_key,
+                        right_on    = right_key,
+                        how         = how,
+                        suffixes    = ('','_duplicated')
+                    )
+                    main_df.index.name = index_name
 
-                if config.setting['VERBOSE']: logging.info(f"Added {len(other_df[right_key].dropna())} new unique values to dataframe.")
+                    main_df.drop(columns=right_key, inplace=True)
+                    if config.setting['VERBOSE']: logging.info(f"Added {len(other_df[right_key].dropna())} new unique values to dataframe.")
+
+                # Remove tmp columns
+                main_df = main_df.loc[:,~main_df.columns.str.startswith(config.setting['JOIN_PREFIX'])]
 
             new_columns = list(set(begin_columns) ^ set(main_df.columns))
             if len(new_columns) > 0:
@@ -127,7 +144,7 @@ def __extract_dtypes(
             df[__column_name(df, column)] = pd.to_numeric(df[column].replace('.','').replace(',','.'), downcast='float', errors='coerce')
 
         for column in df.select_dtypes(include='object', exclude='number').columns:
-            dates = pd.to_datetime(df[column], errors='coerce')
+            dates = pd.to_datetime(df[column], errors='coerce', format='mixed')
 
             if not dates.isna().any():
                 if (dates.dt.date == today).all():

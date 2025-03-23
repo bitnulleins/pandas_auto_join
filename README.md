@@ -184,4 +184,4 @@ python -m pandas_auto_join ./example/datasets/flights/flights.csv ./example/data
 ## Paper (Citation)
 
 > [!NOTE]  
-> Paper on the framework with benchmarks has not yet been published, but will be submitted later.
+> Paper on the framework with benchmarks has not yet been published.

@@ -1,10 +1,8 @@
 Type,Model,Size
-Airbus,A321,3580
-Airbus,A321,3409
-Airbus,A333,6030
-Airbus,A320,3409
-Airbus,A319,3409
-Airbus,A320,3580
-Boeing,B738,3580
-Boeing,B739,3570
-Airbus,A332,6030
+Airbus,321,3580
+Airbus,333,6030
+Airbus,319,3409
+Airbus,320,3580
+Boeing,738,3580
+Boeing,739,3570
+Airbus,332,6030
